@@ -3,10 +3,7 @@ package com.codecool.shop.controller;
 import com.codecool.shop.dbconnection.DBConnection;
 import com.codecool.shop.model.LineItem;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 
 public class CartController extends DBConnection {
@@ -77,13 +74,31 @@ public class CartController extends DBConnection {
 
     public void updateQuantityDB(String userId, String prodName, Integer quantity) {
         Integer prodId = getProductId(prodName);
-        String updateQuery = "UPDATE cart SET quantity = " + quantity + " WHERE user_id = '" + userId + "' AND product_id = " + prodId + ";";
-        String deleteQuery = "DELETE FROM cart WHERE user_id = '" + userId + "' AND product_id = '" + prodId + "';";
+        String updateQuery = "UPDATE cart SET quantity = ? WHERE user_id = ? AND product_id = ?;";
+        String deleteQuery = "DELETE FROM cart WHERE user_id = ? AND product_id = ?;";
+
 
         if (quantity == 0) {
-            executeQuery(deleteQuery);
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(deleteQuery);
+                statement.setString(1, userId);
+                statement.setInt(2, prodId);
+                statement.executeQuery();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         } else {
-            executeQuery(updateQuery);
+            try (Connection connection = getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(updateQuery);
+                statement.setInt(1, quantity);
+                statement.setString(2, userId);
+                statement.setInt(3, prodId);
+                statement.executeQuery();
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
     }
 
