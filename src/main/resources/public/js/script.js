@@ -1,10 +1,6 @@
 $(document).ready(function () {
 
     $('.menu').hide();
-    $('#crcard-dropdown').hide();
-    $('.paypal-wrapper').hide();
-    $('.ccard-wrapper').hide();
-    // $('.button').hide();
 
     $(document).on('click', '.filter-cat-button', function () {
         $('.menu').hide(300);
@@ -66,7 +62,6 @@ $(document).ready(function () {
             url: '/updateShoppingCart?productName=' + name + '&quantity=' + quantity,
             type: "get",
             success: function (response) {
-                console.log(response);
                 checkCartSize();
                 getTotalPrice();
             }
@@ -79,7 +74,6 @@ $(document).ready(function () {
             url: '/updateShoppingCart?productName=' + name + '&quantity=0',
             type: "get",
             success: function (response) {
-                console.log(response);
                 checkCartSize();
             }
         });
@@ -122,7 +116,6 @@ $(document).ready(function () {
                 type: "get",
                 success: function (data) {
                     var products = JSON.parse(data);
-                    console.log(products);
                     for (var i = 0; i < products.length; i++) {
                         var name = products[i].name;
                         var quantity = products[i].quantity;
@@ -137,16 +130,21 @@ $(document).ready(function () {
         }
     })
 
+    $(document).on('keydown', function (e) {
+        if (e.keyCode === 27) {
+            $('.cart-modal').removeClass('active');
+        };
+    });
 
-    var populate = function (name, quantity, price) {
-        var cartItem = `<div class="cart-item">
-                        <div class="item-name">` + name + `</div>
-                        <div class="item-quantity">quantity: <input type="text" class="quantity-input" data-name="` + name + `" value="` + quantity + `"></input> </div>
-                        <div class="item-price">price: ` + price + `</div>
-                        <i class="fa fa-trash" aria-hidden="true" data-name="` + name + `"></i>
-                    </div>`
-        return cartItem;
-    }
+    $(document).on('click', '#show-crcard-option', function () {
+        var menuBox = $('#crcard-dropdown');
+        menuBox.show(300);
+    });
+
+    $(document).on('click', '#hide-crcard-option', function () {
+        var menuBox = $('#crcard-dropdown');
+        menuBox.hide(300);
+    });
 
     var renderCartItems = function (cartItem) {
         $('.cart-item-container').append(cartItem);
@@ -173,11 +171,9 @@ $(document).ready(function () {
             type: "get",
             success: function (response) {
                 if (response == "null") {
-                    console.log("none");
                     $('#sign-out').css("display", "none");
                 }
                 else {
-                    console.log("none");
                     $('#sign-out').css("display", "flex");
                 }
             }
@@ -193,35 +189,16 @@ $(document).ready(function () {
             }
         });
     }
-
     checkCartSize();
     checkUserLoggedIn();
 
-    $(document).on('keydown', function (e) {
-        if (e.keyCode === 27) {
-            $('.cart-modal').removeClass('active');
-        }
-        ;
-    });
-
-    $(document).on('click', '#show-crcard-option', function () {
-        var menuBox = $('#crcard-dropdown');
-        menuBox.show(300);
-    });
-
-    $(document).on('click', '#hide-crcard-option', function () {
-        var menuBox = $('#crcard-dropdown');
-        menuBox.hide(300);
-    });
-
-    $('#ppal').click(function () {
-        $('.ccard-wrapper').hide();
-        $('.button').show();
-        $('.paypal-wrapper').show();
-    })
-    $('#ccard').click(function () {
-        $('.paypal-wrapper').hide();
-        $('.button').show();
-        $('.ccard-wrapper').show();
-    })
+    var populate = function (name, quantity, price) {
+        var cartItem = `<div class="cart-item">
+                        <div class="item-name">` + name + `</div>
+                        <div class="item-quantity">quantity: <input type="text" class="quantity-input" data-name="` + name + `" value="` + quantity + `"></input> </div>
+                        <div class="item-price">price: ` + price + `</div>
+                        <i class="fa fa-trash" aria-hidden="true" data-name="` + name + `"></i>
+                    </div>`
+        return cartItem;
+    }
 })

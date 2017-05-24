@@ -29,7 +29,8 @@ public class OrderController extends DBConnection {
     }
 
     private void insertOrderData(String user_ID, Integer quantity, Integer prodID) {
-        String query = "INSERT INTO orders (user_id, quantity, status, product_id) VALUES('" + user_ID + "'," + quantity + ",'paid'," + prodID + ")";
+        String query = "INSERT INTO orders (user_id, quantity, status, product_id) VALUES('" + user_ID + "'," +
+                quantity + ",'paid'," + prodID + ")";
         executeQuery(query);
     }
 
