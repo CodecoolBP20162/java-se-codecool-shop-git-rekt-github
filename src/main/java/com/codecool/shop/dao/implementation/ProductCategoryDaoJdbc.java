@@ -42,7 +42,7 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
         return categories;
     }
 
-    ProductCategory getCategory(int id) {
+    public ProductCategory getCategory(int id) {
         String categoryId = Integer.toString(id);
         ProductCategory result = null;
 
