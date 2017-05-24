@@ -5,7 +5,9 @@ import com.codecool.shop.dbconnection.DBConnection;
 import java.sql.*;
 import java.util.UUID;
 
-
+/**
+ * This class is responsible for actions related to customers.
+ */
 public class CustomerController extends DBConnection {
 
     public Boolean loginValidation(String login, String pw) {
@@ -30,6 +32,11 @@ public class CustomerController extends DBConnection {
         return false;
     }
 
+    /**
+     * Fetches a user from the database.
+     * @param userName Name of user
+     * @return Data of the requested user
+     */
     public String getUserId(String userName) {
         String query = "SELECT user_id FROM customer WHERE username='" + userName + "';";
 
@@ -49,6 +56,14 @@ public class CustomerController extends DBConnection {
         return "getUserId failed";
     }
 
+    /**
+     * Registers a new user and stores the new data.
+     * @param name Name of user
+     * @param email Email of user
+     * @param username Requested username
+     * @param password Requested password
+     * @param address Address of user
+     */
     public void registerUser(String name, String email, String username, String password, String address) {
         String user_id = UUID.randomUUID().toString();
 
