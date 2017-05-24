@@ -7,6 +7,9 @@ import com.codecool.shop.model.Supplier;
 import java.sql.*;
 import java.util.ArrayList;
 
+/**
+ * This is a DAO for the suppliers. It contains methods which handle objects related to it from a database.
+ */
 public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
 
     private static ArrayList<Supplier> suppliers = new ArrayList<>();
@@ -15,6 +18,10 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
     private SupplierDaoJdbc() {
     }
 
+    /**
+     * @see ProductCategoryDaoMem#getInstance()
+     * @return The one and only instance of this class
+     */
     public static SupplierDaoJdbc getInstance() {
         if (instance == null) {
             instance = new SupplierDaoJdbc();
@@ -22,6 +29,11 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
         return instance;
     }
 
+    /**
+     * Fetches every supplier and related data.
+     *
+     * @return Suppliers as objects
+     */
     @Override
     public ArrayList<Supplier> getAll() {
         suppliers.clear();
@@ -40,6 +52,12 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
         return suppliers;
     }
 
+    /**
+     * Fetches a supplier from the memory.
+     *
+     * @param id ID of supplier
+     * @return The supplier as an object
+     */
     static Supplier getSupplier(String id) {
         Supplier result = null;
         for (Supplier supplier : suppliers) {
@@ -50,6 +68,11 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
         return result;
     }
 
+    /**
+     * Adds a new supplier to the database.
+     *
+     * @param supplier The supplier as an object
+     */
     @Override
     public void add(Supplier supplier) {
         int newId = suppliers.size() + 1;
@@ -57,6 +80,12 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
         executeQuery(query);
     }
 
+    /**
+     * Finds the requested supplier.
+     *
+     * @param id ID of supplier
+     * @return The supplier as an object
+     */
     @Override
     public Supplier find(int id) {
         String query = "SELECT * FROM supplier WHERE id=" + id + ";";
@@ -73,6 +102,4 @@ public class SupplierDaoJdbc extends DBConnection implements SupplierDao {
         }
         return foundSupplier;
     }
-
-
 }
