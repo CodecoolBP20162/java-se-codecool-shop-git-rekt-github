@@ -189,7 +189,7 @@ public class Main {
             }
         });
 
-        // Add this line to your project to enable the debug screen
+        // Enabling the debug screen
         enableDebugScreen();
     }
 
@@ -198,7 +198,7 @@ public class Main {
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
         SupplierDao supplierDataStore = SupplierDaoMem.getInstance();
 
-        //setting up new suppliers
+        // setting up new suppliers
         Supplier amazon = new Supplier("Amazon", "Digital content and services");
         supplierDataStore.add(amazon);
         Supplier lenovo = new Supplier("Lenovo", "Computers and laptops");
@@ -218,7 +218,7 @@ public class Main {
         Supplier pfizer = new Supplier("Pfizer", "One of the world's largest pharmaceutical companies");
         supplierDataStore.add(pfizer);
 
-        //setting up new product categories
+        // setting up new product categories
         ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
         productCategoryDataStore.add(tablet);
         ProductCategory laptop = new ProductCategory("Laptop", "Hardware", "Portable computers used for a variety of purposes.");
@@ -236,7 +236,7 @@ public class Main {
         ProductCategory foodSupplement = new ProductCategory("FoodSupplement", "Health", "Protein without limits.");
         productCategoryDataStore.add(foodSupplement);
 
-        //setting up products and printing them
+        // setting up products and printing them
         productDataStore.add(new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls.", tablet, amazon));
         productDataStore.add(new Product("Lenovo IdeaPad", 479, "USD", "Keyboard cover is included. Fanless Core m5 processor. Full-size USB ports.", tablet, lenovo));
         productDataStore.add(new Product("Amazon Fire HD 8", 220, "USD", "Amazon's latest Fire HD 8 tablet is a great value for media consumption.", tablet, amazon));
