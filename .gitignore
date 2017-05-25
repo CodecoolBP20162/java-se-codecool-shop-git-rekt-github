@@ -21,6 +21,7 @@ hs_err_pid*
 db_config.txt
 create_db.log
 create_db_error.log
+codecoolShop.log
 
 /db_config.txt
 

@@ -1,5 +1,8 @@
 package com.codecool.shop.dbconnection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -13,9 +16,12 @@ public abstract class DBConnection {
     private static final String DATABASE = "jdbc:postgresql://localhost:5432/codecoolshop";
     private static final String DB_USER = DBPassword.readFile().get(0);
     private static final String DB_PASSWORD = DBPassword.readFile().get(1);
+    private static final Logger logger = LoggerFactory.getLogger(DBConnection.class);
+
 
     /**
      * Gets the connection with the class parameters.
+     *
      * @return Database parameters
      * @throws SQLException The throws SQL Exception in case tge method fails
      */
@@ -28,6 +34,7 @@ public abstract class DBConnection {
 
     /**
      * Executes a prepared statement.
+     *
      * @param query The SQL query to be executed as string
      */
     protected void executeQuery(String query) {
@@ -35,6 +42,7 @@ public abstract class DBConnection {
              Statement statement = connection.createStatement()) {
             statement.execute(query);
         } catch (SQLException e) {
+            logger.warn("{} exception occured.", e.toString());
             e.printStackTrace();
         }
     }

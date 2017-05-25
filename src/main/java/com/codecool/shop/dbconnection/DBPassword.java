@@ -1,5 +1,8 @@
 package com.codecool.shop.dbconnection;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.ArrayList;
@@ -9,8 +12,12 @@ import java.util.ArrayList;
  */
 public class DBPassword {
 
+    private static final Logger logger = LoggerFactory.getLogger(DBPassword.class);
+
+
     /**
      * Reads target text file which contains the password.
+     *
      * @return Parsed data for database authentication
      */
     public static ArrayList<String> readFile() {
@@ -28,7 +35,7 @@ public class DBPassword {
             return records;
 
         } catch (Exception e) {
-            System.err.format("Exception occurred trying to read '%s'.", filename);
+            logger.warn("{} exception occured.", e.toString());
             e.printStackTrace();
             return null;
         }

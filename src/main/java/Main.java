@@ -33,21 +33,24 @@ public class Main {
 
         // populate some data for the memory storage
         populateData();
-        logger.info("sample data initialized for DaoMem methods");
+        logger.info("Successful data population");
 
         // generating Supplier and Product category objects from the DB
         SupplierDaoJdbc suppliers = SupplierDaoJdbc.getInstance();
         ProductCategoryDaoJdbc prodCategs = ProductCategoryDaoJdbc.getInstance();
         suppliers.getAll();
         prodCategs.getAll();
+        logger.info("Database initialization successful");
 
         // generating controller instances
         CartController cartController = new CartController();
         OrderController orderController = new OrderController();
         CustomerController customerController = new CustomerController();
+        logger.info("Controller generation successful");
 
         // generating shopping cart
         ShoppingCart cart = ShoppingCart.getInstance();
+        logger.info("Cart initialization successful");
 
         // Always add generic routes to the end
         get("/", (Request req, Response res) -> {
@@ -59,10 +62,11 @@ public class Main {
             String size = cart.getCartSize();
             String userId = req.session().attribute("currentUser");
             if (userId == null) {
-                logger.warn("user tried to see cart but was not logged in");
+                logger.warn("User is not logged in");
                 return "user is not logged in";
             } else {
                 cartController.checkCartDB(userId, productId);
+                logger.debug("Checked product: {} of user: {}.", productId, userId);
                 return (size + " items");
             }
         });
@@ -70,17 +74,20 @@ public class Main {
         get("/addCartToOrder", (req, res) -> {
             String userId = req.session().attribute("currentUser");
             orderController.addCartToOrder(userId);
+            logger.debug("{}'s cart was added to order.");
             return "success";
         });
 
         get("/getCartSize", (req, res) -> {
             String userID = req.session().attribute("currentUser");
+            logger.debug("Cart size of {} user was checked", userID);
             return (cartController.getCartSize(userID));
         });
 
         get("/getTotalPrice", (req, res) -> {
             String userID = req.session().attribute("currentUser");
             String cartTotalPrice = cartController.getTotalPrice(userID);
+            logger.debug("{} user's cart's total price: {}", userID, cartTotalPrice);
             return ("Total: " + cartTotalPrice + " $");
         });
 
@@ -94,6 +101,7 @@ public class Main {
                 String productJson = mapper.writeValueAsString(prod);
                 result.add(productJson);
             }
+            logger.debug("User: {} cart is {}", userID, result);
             return result;
         });
 
@@ -101,10 +109,9 @@ public class Main {
             HashMap<String, HashMap> cartContent = new HashMap<>();
             HashMap<String, String> totalPrice = new HashMap<>();
             totalPrice.put("totalPrice", cart.getTotalPrice());
-            System.out.println(totalPrice);
             cartContent.put("cartContent", cart.getCartContent());
             cartContent.put("totalPrice", totalPrice);
-            System.out.println(cartContent);
+            logger.debug("Checkout with {} content", cartContent);
             return renderTemplate("product/checkout", cartContent);
         });
 
@@ -140,6 +147,7 @@ public class Main {
             Integer quantity = Integer.parseInt(req.queryParams("quantity"));
             String userID = req.session().attribute("currentUser");
             cartController.updateQuantityDB(userID, productName, quantity);
+            logger.debug("User: {}, product: {}, quantity: {} - updated.", userID, productName, quantity);
             return "success";
         });
 
@@ -154,7 +162,6 @@ public class Main {
         });
 
         post("/register", (req, res) -> {
-
             String name = req.queryParams("name");
             String email = req.queryParams("email");
             String username = req.queryParams("username");
@@ -162,8 +169,8 @@ public class Main {
             String address = req.queryParams("address");
             String data = name + email + username + password + address;
             customerController.registerUser(name, email, username, password, address);
-
             res.redirect("/");
+            logger.debug("User with {} registered.", data);
             return 1;
         });
 
@@ -185,11 +192,13 @@ public class Main {
             req.session().removeAttribute("currentUser");
             HashMap<String, ArrayList> dummyHashMap = new HashMap<>();
             res.redirect("/");
+            logger.debug("User is logged out.");
             return 1;
         });
 
         get("/checkUser", (req, res) -> {
             String user = req.session().attribute("currentUser");
+            logger.debug("{} user is checked.", user);
             if (user == null) {
                 return "null";
             } else {
@@ -197,7 +206,7 @@ public class Main {
             }
         });
 
-        // Enabling the debug screen
+        // Add this line to your project to enable the debug screen
         enableDebugScreen();
     }
 
