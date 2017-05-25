@@ -1,12 +1,19 @@
 package com.codecool.shop.controller;
 
 import com.codecool.shop.dbconnection.DBConnection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.UUID;
 
-
+/**
+ * This class is responsible for actions related to customers.
+ */
 public class CustomerController extends DBConnection {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerController.class);
+
 
     public Boolean loginValidation(String login, String pw) {
         String query = "SELECT username, password FROM customer WHERE username = ? AND password = ? ";
@@ -21,15 +28,23 @@ public class CustomerController extends DBConnection {
                 String username = result.getString("username");
                 String password = result.getString("password");
                 if (login.equals(username) && pw.equals(password)) {
+                    logger.debug("Login for user: {} was successful", login);
                     return true;
                 }
             }
         } catch (SQLException e) {
+            logger.warn("Exception: {}", e.toString());
             e.printStackTrace();
         }
         return false;
     }
 
+    /**
+     * Fetches a user from the database.
+     *
+     * @param userName Name of user
+     * @return Data of the requested user
+     */
     public String getUserId(String userName) {
         String query = "SELECT user_id FROM customer WHERE username='" + userName + "';";
 
@@ -39,16 +54,26 @@ public class CustomerController extends DBConnection {
 
             while (resultSet.next()) {
                 String name = resultSet.getString("user_id");
+                logger.debug("UserID for {} was found", userName);
                 return name;
             }
         } catch (
-                SQLException e)
-        {
+                SQLException e) {
+            logger.warn("Exception: {}", e.toString());
             e.printStackTrace();
         }
         return "getUserId failed";
     }
 
+    /**
+     * Registers a new user and stores the new data.
+     *
+     * @param name     Name of user
+     * @param email    Email of user
+     * @param username Requested username
+     * @param password Requested password
+     * @param address  Address of user
+     */
     public void registerUser(String name, String email, String username, String password, String address) {
         String user_id = UUID.randomUUID().toString();
 
@@ -63,8 +88,9 @@ public class CustomerController extends DBConnection {
             statement.setString(6, address);
             statement.setString(7, address);
             statement.executeQuery();
-
+            logger.debug("Registration for {} was successful", username);
         } catch (SQLException e) {
+            logger.warn("Exception: {}", e.toString());
             e.printStackTrace();
         }
     }

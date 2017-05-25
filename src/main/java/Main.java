@@ -1,23 +1,30 @@
-import static spark.Spark.*;
-import static spark.debug.DebugScreen.enableDebugScreen;
-
 import com.codecool.shop.controller.CartController;
 import com.codecool.shop.controller.CustomerController;
 import com.codecool.shop.controller.OrderController;
 import com.codecool.shop.controller.ProductController;
-import com.codecool.shop.dao.*;
+import com.codecool.shop.dao.ProductCategoryDao;
+import com.codecool.shop.dao.ProductDao;
+import com.codecool.shop.dao.SupplierDao;
 import com.codecool.shop.dao.implementation.*;
 import com.codecool.shop.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import spark.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
+
+import static spark.Spark.*;
+import static spark.debug.DebugScreen.enableDebugScreen;
 
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         // default server settings
@@ -27,20 +34,24 @@ public class Main {
 
         // populate some data for the memory storage
         populateData();
+        logger.info("Successful data population");
 
         // generating Supplier and Product category objects from the DB
         SupplierDaoJdbc suppliers = SupplierDaoJdbc.getInstance();
         ProductCategoryDaoJdbc prodCategs = ProductCategoryDaoJdbc.getInstance();
         suppliers.getAll();
         prodCategs.getAll();
+        logger.info("Database initialization successful");
 
         // generating controller instances
         CartController cartController = new CartController();
         OrderController orderController = new OrderController();
         CustomerController customerController = new CustomerController();
+        logger.info("Controller generation successful");
 
         // generating shopping cart
         ShoppingCart cart = ShoppingCart.getInstance();
+        logger.info("Cart initialization successful");
 
         // Always add generic routes to the end
         get("/", (Request req, Response res) -> {
@@ -52,9 +63,11 @@ public class Main {
             String size = cart.getCartSize();
             String userId = req.session().attribute("currentUser");
             if (userId == null) {
+                logger.warn("User is not logged in");
                 return "user is not logged in";
             } else {
                 cartController.checkCartDB(userId, productId);
+                logger.debug("Checked product: {} of user: {}.", productId, userId);
                 return (size + " items");
             }
         });
@@ -62,30 +75,35 @@ public class Main {
         get("/addCartToOrder", (req, res) -> {
             String userId = req.session().attribute("currentUser");
             orderController.addCartToOrder(userId);
+            logger.debug("{}'s cart was added to order.");
             return "success";
         });
 
         get("/getCartSize", (req, res) -> {
             String userID = req.session().attribute("currentUser");
+            logger.debug("Cart size of {} user was checked", userID);
             return (cartController.getCartSize(userID));
         });
 
         get("/getTotalPrice", (req, res) -> {
             String userID = req.session().attribute("currentUser");
             String cartTotalPrice = cartController.getTotalPrice(userID);
+            logger.debug("{} user's cart's total price: {}", userID, cartTotalPrice);
             return ("Total: " + cartTotalPrice + " $");
         });
 
         get("/getCartContentFromDB", (Request req, Response res) -> {
             String userID = req.session().attribute("currentUser");
-            ArrayList<LineItem> items = cartController.getCartContentDB(userID);
+            Stack<LineItem> items = cartController.getCartContentDB(userID);
             ObjectMapper mapper = new ObjectMapper();
             ArrayList<String> result = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                LineItem prod = items.get(i);
+            while(items.size() != 0) {
+                System.out.println(items.size());
+                LineItem prod = items.pop();
                 String productJson = mapper.writeValueAsString(prod);
                 result.add(productJson);
             }
+            logger.debug("User: {} cart is {}", userID, result);
             return result;
         });
 
@@ -93,10 +111,9 @@ public class Main {
             HashMap<String, HashMap> cartContent = new HashMap<>();
             HashMap<String, String> totalPrice = new HashMap<>();
             totalPrice.put("totalPrice", cart.getTotalPrice());
-            System.out.println(totalPrice);
             cartContent.put("cartContent", cart.getCartContent());
             cartContent.put("totalPrice", totalPrice);
-            System.out.println(cartContent);
+            logger.debug("Checkout with {} content", cartContent);
             return renderTemplate("product/checkout", cartContent);
         });
 
@@ -132,6 +149,7 @@ public class Main {
             Integer quantity = Integer.parseInt(req.queryParams("quantity"));
             String userID = req.session().attribute("currentUser");
             cartController.updateQuantityDB(userID, productName, quantity);
+            logger.debug("User: {}, product: {}, quantity: {} - updated.", userID, productName, quantity);
             return "success";
         });
 
@@ -146,7 +164,6 @@ public class Main {
         });
 
         post("/register", (req, res) -> {
-
             String name = req.queryParams("name");
             String email = req.queryParams("email");
             String username = req.queryParams("username");
@@ -154,8 +171,8 @@ public class Main {
             String address = req.queryParams("address");
             String data = name + email + username + password + address;
             customerController.registerUser(name, email, username, password, address);
-
             res.redirect("/");
+            logger.debug("User with {} registered.", data);
             return 1;
         });
 
@@ -177,11 +194,13 @@ public class Main {
             req.session().removeAttribute("currentUser");
             HashMap<String, ArrayList> dummyHashMap = new HashMap<>();
             res.redirect("/");
+            logger.debug("User is logged out.");
             return 1;
         });
 
         get("/checkUser", (req, res) -> {
             String user = req.session().attribute("currentUser");
+            logger.debug("{} user is checked.", user);
             if (user == null) {
                 return "null";
             } else {
@@ -198,7 +217,7 @@ public class Main {
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
         SupplierDao supplierDataStore = SupplierDaoMem.getInstance();
 
-        //setting up new suppliers
+        // setting up new suppliers
         Supplier amazon = new Supplier("Amazon", "Digital content and services");
         supplierDataStore.add(amazon);
         Supplier lenovo = new Supplier("Lenovo", "Computers and laptops");
@@ -218,7 +237,7 @@ public class Main {
         Supplier pfizer = new Supplier("Pfizer", "One of the world's largest pharmaceutical companies");
         supplierDataStore.add(pfizer);
 
-        //setting up new product categories
+        // setting up new product categories
         ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
         productCategoryDataStore.add(tablet);
         ProductCategory laptop = new ProductCategory("Laptop", "Hardware", "Portable computers used for a variety of purposes.");
@@ -236,7 +255,7 @@ public class Main {
         ProductCategory foodSupplement = new ProductCategory("FoodSupplement", "Health", "Protein without limits.");
         productCategoryDataStore.add(foodSupplement);
 
-        //setting up products and printing them
+        // setting up products and printing them
         productDataStore.add(new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls.", tablet, amazon));
         productDataStore.add(new Product("Lenovo IdeaPad", 479, "USD", "Keyboard cover is included. Fanless Core m5 processor. Full-size USB ports.", tablet, lenovo));
         productDataStore.add(new Product("Amazon Fire HD 8", 220, "USD", "Amazon's latest Fire HD 8 tablet is a great value for media consumption.", tablet, amazon));

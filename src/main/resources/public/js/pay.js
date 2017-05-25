@@ -1,8 +1,6 @@
 
 $(document).ready(function () {
 
-
-
 	var getTotalPrice = function () {
         $.ajax({
             url: '/getTotalPrice',
