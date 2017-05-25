@@ -42,9 +42,9 @@ public class MockitoTestSupplierDao {
     @ParameterizedTest
     @MethodSource(names = "daoAndMem")
     void testAdd(SupplierDao argument) {
-        argument.add(mockSupplier1);
-        Mockito.when(argument.find(argument.getAll().size())).thenReturn(mockSupplier1);
-        assertEquals(mockSupplier1, argument.find(argument.getAll().size()));
+        argument.add(mockSupplier2);
+        Mockito.when(argument.find(argument.getAll().size())).thenReturn(mockSupplier2);
+        assertEquals(mockSupplier2, argument.find(argument.getAll().size()));
     }
 
     static Stream<SupplierDao> daoAndMem() {
