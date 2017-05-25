@@ -7,8 +7,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * This class is responsible for actions related to orders.
+ */
 public class OrderController extends DBConnection {
 
+    /**
+     * Stores the content of the shopping cart as an order in the database.
+     * @param userID ID of user
+     */
     public void addCartToOrder(String userID) {
         String query = "SELECT * FROM cart WHERE user_id = '" + userID + "';";
 
@@ -28,14 +35,24 @@ public class OrderController extends DBConnection {
         }
     }
 
-    private void insertOrderData(String user_ID, Integer quantity, Integer prodID) {
-        String query = "INSERT INTO orders (user_id, quantity, status, product_id) VALUES('" + user_ID + "'," +
+    /**
+     * Inserts new data for an order into the database.
+     * @param userID ID of user
+     * @param quantity Quantity of item
+     * @param prodID ID of product
+     */
+    private void insertOrderData(String userID, Integer quantity, Integer prodID) {
+        String query = "INSERT INTO orders (user_id, quantity, status, product_id) VALUES('" + userID + "'," +
                 quantity + ",'paid'," + prodID + ")";
         executeQuery(query);
     }
 
-    private void deleteCart(String userid) {
-        String query = "DELETE FROM cart WHERE user_id = '" + userid + "'";
+    /**
+     * Clears out the content of the shopping cart from the database.
+     * @param userID ID of user
+     */
+    private void deleteCart(String userID) {
+        String query = "DELETE FROM cart WHERE user_id = '" + userID + "'";
         executeQuery(query);
     }
 }

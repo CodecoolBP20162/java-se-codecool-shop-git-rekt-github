@@ -9,13 +9,21 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This is a DAO for the product categories. It contains methods which handle objects related to it from a database.
+ */
 public class ProductCategoryDaoJdbc extends DBConnection implements ProductCategoryDao {
+
     private static ArrayList<ProductCategory> categories = new ArrayList<>();
     private static ProductCategoryDaoJdbc instance = null;
 
     private ProductCategoryDaoJdbc() {
     }
 
+    /**
+     * @see ProductCategoryDaoMem#getInstance()
+     * @return The one and only instance of this class
+     */
     public static ProductCategoryDaoJdbc getInstance() {
         if (instance == null) {
             instance = new ProductCategoryDaoJdbc();
@@ -23,6 +31,11 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
         return instance;
     }
 
+    /**
+     * Fetches every product category and related data.
+     *
+     * @return Product categories as objects
+     */
     @Override
     public List<ProductCategory> getAll() {
         categories.clear();
@@ -42,6 +55,12 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
         return categories;
     }
 
+    /**
+     * Fetches a given product category based on ID.
+     *
+     * @param id ID of product category
+     * @return The product category as an object
+     */
     ProductCategory getCategory(int id) {
         String categoryId = Integer.toString(id);
         ProductCategory result = null;
@@ -54,6 +73,12 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
         return result;
     }
 
+    /**
+     * Finds the requested product category.
+     *
+     * @param id ID of product category
+     * @return The product category as an object
+     */
     @Override
     public ProductCategory find(int id) {
         String query = "SELECT * FROM category WHERE id=" + id + ";";
@@ -71,13 +96,15 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
         return foundCategory;
     }
 
+    /**
+     * Adds a new product category to the database.
+     *
+     * @param category The product category object
+     */
     @Override
     public void add(ProductCategory category) {
         int newId = categories.size() + 1;
         String query = "INSERT INTO category (id, name, department) VALUES (" + newId + ",'" + category.getName() + "','" + category.getDepartment() + "');";
         executeQuery(query);
     }
-
-
-
 }
