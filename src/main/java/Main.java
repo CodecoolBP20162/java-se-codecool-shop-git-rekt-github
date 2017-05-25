@@ -17,6 +17,7 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 import static spark.Spark.*;
 import static spark.debug.DebugScreen.enableDebugScreen;
@@ -93,11 +94,12 @@ public class Main {
 
         get("/getCartContentFromDB", (Request req, Response res) -> {
             String userID = req.session().attribute("currentUser");
-            ArrayList<LineItem> items = cartController.getCartContentDB(userID);
+            Stack<LineItem> items = cartController.getCartContentDB(userID);
             ObjectMapper mapper = new ObjectMapper();
             ArrayList<String> result = new ArrayList<>();
-            for (int i = 0; i < items.size(); i++) {
-                LineItem prod = items.get(i);
+            while(items.size() != 0) {
+                System.out.println(items.size());
+                LineItem prod = items.pop();
                 String productJson = mapper.writeValueAsString(prod);
                 result.add(productJson);
             }

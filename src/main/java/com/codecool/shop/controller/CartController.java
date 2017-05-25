@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.Stack;
 
 
 /**
@@ -70,8 +70,8 @@ public class CartController extends DBConnection {
      * @param userID ID of user
      * @return Content of the shopping cart
      */
-    public ArrayList<LineItem> getCartContentDB(String userID) {
-        ArrayList<LineItem> products = new ArrayList<>();
+    public Stack<LineItem> getCartContentDB(String userID) {
+        Stack<LineItem> products = new Stack<>();
         String query = "SELECT product.name, product.defaultprice, cart.quantity, product.defaultprice * cart.quantity AS total FROM cart JOIN product ON cart.product_id = product.id WHERE cart.user_id = '" + userID + "';";
 
         try (Connection connection = getConnection()) {
@@ -81,7 +81,7 @@ public class CartController extends DBConnection {
                 String productName = resultSet.getString("name");
                 Integer quantity = resultSet.getInt("quantity");
                 Integer defaultPrice = resultSet.getInt("defaultprice");
-                products.add(new LineItem(productName, defaultPrice, "USD", quantity));
+                products.push(new LineItem(productName, defaultPrice, "USD", quantity));
             }
             logger.debug("{} users cart content was returned", userID);
         } catch (SQLException e) {
