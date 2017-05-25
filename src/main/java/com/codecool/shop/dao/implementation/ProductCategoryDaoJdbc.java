@@ -61,7 +61,7 @@ public class ProductCategoryDaoJdbc extends DBConnection implements ProductCateg
      * @param id ID of product category
      * @return The product category as an object
      */
-    ProductCategory getCategory(int id) {
+    public ProductCategory getCategory(int id) {
         String categoryId = Integer.toString(id);
         ProductCategory result = null;
 
