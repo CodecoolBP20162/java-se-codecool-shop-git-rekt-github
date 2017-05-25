@@ -1,23 +1,29 @@
-import static spark.Spark.*;
-import static spark.debug.DebugScreen.enableDebugScreen;
-
 import com.codecool.shop.controller.CartController;
 import com.codecool.shop.controller.CustomerController;
 import com.codecool.shop.controller.OrderController;
 import com.codecool.shop.controller.ProductController;
-import com.codecool.shop.dao.*;
+import com.codecool.shop.dao.ProductCategoryDao;
+import com.codecool.shop.dao.ProductDao;
+import com.codecool.shop.dao.SupplierDao;
 import com.codecool.shop.dao.implementation.*;
 import com.codecool.shop.model.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
-import spark.ModelAndView;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import static spark.Spark.*;
+import static spark.debug.DebugScreen.enableDebugScreen;
+
 public class Main {
+
+    private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
         // default server settings
@@ -27,6 +33,7 @@ public class Main {
 
         // populate some data for the memory storage
         populateData();
+        logger.info("sample data initialized for DaoMem methods");
 
         // generating Supplier and Product category objects from the DB
         SupplierDaoJdbc suppliers = SupplierDaoJdbc.getInstance();
@@ -52,6 +59,7 @@ public class Main {
             String size = cart.getCartSize();
             String userId = req.session().attribute("currentUser");
             if (userId == null) {
+                logger.warn("user tried to see cart but was not logged in");
                 return "user is not logged in";
             } else {
                 cartController.checkCartDB(userId, productId);
